@@ -11,21 +11,10 @@ RUN yum install -y nginx
 RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && composer -V
 ADD . /src/app/
 WORKDIR /src/app/
-
-RUN composer install && cp includes/config.environment.inc.php includes/config.inc.php
 RUN echo $'\
 service nginx start \n\
 php -S 0.0.0.0:8080 \n\
 '> docker-entrypoint.sh && chmod a+x docker-entrypoint.sh
-ONBUILD RUN echo $'\
-server {\n\
-  listen 80;\n\
-  location /'${PREFIX}$' {\n\
-    rewrite ^/'${PREFIX}$'/(.+) $1 last;\n\
-    proxy_pass http://127.0.0.1:8080;\n\
-  }\n\
-}\n\
-'> /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
